@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { useDispatch, useSelector } from "react-redux";
+import "./App.css";
+import { clearData, fetchSwapiData } from "./store/swapiSlice";
 
 function App() {
+  const dispatch = useDispatch();
+  const {
+    data = [],
+    loading,
+    error,
+  } = useSelector((state) => state.swapi || {});
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Hello</h1>
+
+      <button onClick={() => dispatch(fetchSwapiData())}>get info</button>
+
+      <button onClick={() => dispatch(clearData())}>clear</button>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {data.length > 0 ? (
+        data.map((item, index) => <p key={index}>{item.name}</p>)
+      ) : (
+        <p>No data available</p>
+      )}
     </div>
   );
 }
