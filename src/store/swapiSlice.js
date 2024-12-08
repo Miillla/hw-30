@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
 
 const initialState = {
   data: [],
   loading: false,
   error: null,
+  url: "https://swapi.dev/api/people/",
 };
 
 const swapiSlice = createSlice({
@@ -16,9 +18,14 @@ const swapiSlice = createSlice({
     },
     fetchSuccess: (state, action) => {
       state.loading = false;
-      state.data = action.payload;
+      state.data = action.payload.results;
+      state.url = action.payload.next;
     },
     fetchFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    fetchNext: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
@@ -27,18 +34,22 @@ const swapiSlice = createSlice({
     },
   },
 });
-export const { fetchStart, fetchSuccess, fetchFailure, clearData } =
+export const { fetchStart, fetchSuccess, fetchFailure, fetchNext, clearData } =
   swapiSlice.actions;
 
-export const fetchSwapiData = () => async (dispatch) => {
+export const fetchSwapiData = () => async (dispatch, getState) => {
   dispatch(fetchStart());
+
+  const { url } = getState().swapi;
+
   try {
-    const response = await fetch("https://swapi.dev/api/people/");
+    const response = await fetch(url);
     const data = await response.json();
-    dispatch(fetchSuccess(data.results));
     console.log(data);
-  } catch {
-    dispatch(fetchFailure("Не вдалося отримати дані"));
+    dispatch(fetchSuccess(data));
+  } catch (error) {
+    console.error("Fetch error:", error);
+    dispatch(fetchFailure("Failed to fetch data"));
   }
 };
 

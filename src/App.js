@@ -1,19 +1,20 @@
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
+
 import { clearData, fetchSwapiData } from "./store/swapiSlice";
 
 function App() {
   const dispatch = useDispatch();
-  const {
-    data = [],
-    loading,
-    error,
-  } = useSelector((state) => state.swapi || {});
+
+  const { data, loading, error } = useSelector((state) => state.swapi);
+
   return (
     <div className="App">
       <h1>Hello</h1>
 
-      <button onClick={() => dispatch(fetchSwapiData())}>get info</button>
+      <button onClick={() => dispatch(fetchSwapiData())} disabled={loading}>
+        get info
+      </button>
 
       <button onClick={() => dispatch(clearData())}>clear</button>
       {loading && <p>Loading...</p>}
